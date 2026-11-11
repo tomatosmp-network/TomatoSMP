@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TomatoSMP — Official Voting & Server Commands Portal</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            tomato: {
+              50: '#fff1f1',
+              100: '#ffe0e0',
+              400: '#ff6464',
+              500: '#ef4444',
+              600: '#dc2626',
+              700: '#b91c1c',
+              900: '#450a0a',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f17;
+      color: #f3f4f6;
+      overflow-x: hidden;
+    }
+    .mc-grid-bg {
+      background-image: 
+        radial-gradient(circle at 20% 15%, rgba(239, 68, 68, 0.16), transparent 38%),
+        radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.12), transparent 38%),
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+    .glass-card-hover {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-2px);
+      border-color: rgba(239, 68, 68, 0.45);
+      box-shadow: 0 12px 28px -8px rgba(239, 68, 68, 0.22);
+    }
+    .pixel-shadow {
+      box-shadow: 0 4px 0 #991b1b;
+    }
+    .pixel-shadow:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #991b1b;
+    }
+    .pixel-shadow-green {
+      box-shadow: 0 4px 0 #15803d;
+    }
+    .pixel-shadow-green:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #15803d;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #273244;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ef4444;
+    }
+  </style>
+</head>
+<body class="mc-grid-bg min-h-screen flex flex-col justify-between selection:bg-red-500 selection:text-white">
+
+  <!-- Top Announcement & Server Status Bar -->
+  <div class="bg-gradient-to-r from-red-950/90 via-red-900/75 to-emerald-950/90 border-b border-red-500/25 text-xs sm:text-sm py-2 px-4">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-semibold text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          ONLINE: <span id="onlinePlayersCount">128</span>/250
+        </span>
+        <span class="text-gray-200 hidden md:inline">🍅 <strong>TomatoSMP Season 4</strong> — Earn an instant <strong>Vote Crate Key</strong> + <strong>$500 Coins</strong> on every vote!</span>
+      </div>
+      <div class="flex items-center gap-2 ml-auto">
+        <span class="text-gray-300 text-xs">Server IP:</span>
+        <button id="copyTopIpBtn" type="button" class="inline-flex items-center gap-1.5 bg-gray-900/90 hover:bg-gray-800 text-amber-300 border border-amber-400/30 rounded-md px-2.5 py-0.5 font-mono text-xs font-semibold transition">
+          <span>TomatoSMP.aternos.me</span>
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header / Navbar -->
+  <header class="sticky top-0 z-30 bg-gray-950/85 backdrop-blur-md border-b border-gray-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-red-500 to-red-700 p-0.5 shadow-lg shadow-red-600/30 flex items-center justify-center">
+          <!-- Custom Voxel Tomato SVG -->
+          <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="24" y="6" width="16" height="8" fill="#16a34a"/>
+            <rect x="16" y="10" width="8" height="6" fill="#22c55e"/>
+            <rect x="40" y="10" width="8" height="6" fill="#15803d"/>
+            <rect x="12" y="14" width="40" height="40" rx="6" fill="#ef4444"/>
+            <rect x="16" y="18" width="10" height="10" rx="2" fill="#fca5a5" fill-opacity="0.65"/>
+            <rect x="20" y="30" width="6" height="8" fill="#111827"/>
+            <rect x="38" y="30" width="6" height="8" fill="#111827"/>
+            <rect x="26" y="42" width="12" height="4" fill="#7f1d1d"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+              Tomato<span class="text-red-500">SMP</span>
+            </h1>
+            <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">Vote Hub</span>
+          </div>
+          <p class="text-xs text-gray-400">Official Minecraft Voting & Commands Portal</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-1 sm:gap-2 bg-gray-900/90 p-1.5 rounded-xl border border-gray-800 overflow-x-auto max-w-full" aria-label="Main Navigation">
+        <button type="button" data-tab="vote" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-red-600 text-white shadow">
+          <span>🗳️</span>
+          <span>Vote</span>
+        </button>
+        <button type="button" data-tab="commands" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-gray-800/70">
+          <span>⌨️</span>
+          <span>Commands</span>
+        </button>
+        <button type="button" data-tab="shop" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-gray-800/70">
+          <span>🎁</span>
+          <span>Vote Shop</span>
+        </button>
+        <button type="button" data-tab="leaderboard" class="nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-gray-800/70">
+          <span>🏆</span>
+          <span>Top Voters</span>
+        </button>
+      </nav>
+
+      <!-- Active Player Session Stats Pill -->
+      <div class="flex items-center gap-3 bg-gray-900/90 border border-gray-800 px-3.5 py-2 rounded-xl">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center font-bold text-white text-sm shadow" id="playerAvatarBadge">
+          T
+        </div>
+        <div class="text-xs">
+          <div class="font-bold text-white flex items-center gap-1.5">
+            <span id="headerPlayerName">TomatoPlayer</span>
+            <span id="headerEditionTag" class="text-[10px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">Java</span>
+          </div>
+          <div class="text-gray-400 flex items-center gap-2 mt-0.5">
+            <span>🔑 Keys: <strong class="text-amber-400" id="userKeysCount">2</strong></span>
+            <span>•</span>
+            <span>⭐ Points: <strong class="text-emerald-400" id="userPointsCount">120</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-8">
+
+    <!-- Hero Banner + Player Username Bar + Vote Party Progress -->
+    <section class="glass-card rounded-2xl p-5 sm:p-7 border border-red-500/25 relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-56 h-56 bg-red-600/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <!-- Left Info -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-semibold">
+            <span>🔥 Daily Voting Rewards & In-Game Commands</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+            Vote for TomatoSMP &amp; Earn <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-emerald-400">Free Crate Keys</span>!
+          </h2>
+          <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+            Enter your <strong>Minecraft Username</strong> below and vote across all 6 official links. Claim your rewards anytime in-game using the <code class="text-amber-300 bg-gray-900/90 px-1.5 py-0.5 rounded font-mono text-xs">/voterewards</code> command!
+          </p>
+
+          <!-- Player Username Input & Edition Switcher -->
+          <div class="bg-gray-950/80 p-3.5 rounded-xl border border-gray-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div class="flex-1">
+              <label for="mcUsernameInput" class="block text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1">
+                Your Minecraft Username (IGN)
+              </label>
+              <div class="relative flex items-center">
+                <span class="text-gray-400 pl-3 pr-2 text-sm">👤</span>
+                <input
+                  id="mcUsernameInput"
+                  type="text"
+                  value="TomatoPlayer"
+                  maxlength="20"
+                  placeholder="e.g. Steve or .BedrockPlayer"
+                  class="w-full bg-transparent text-white font-mono text-sm sm:text-base font-bold focus:outline-none pr-3 py-1"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" id="editionJavaBtn" class="px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white border border-emerald-400/40 transition">
+                ☕ Java
+              </button>
+              <button type="button" id="editionBedrockBtn" class="px-3 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition">
+                📱 Bedrock (.)
+              </button>
+              <button type="button" id="saveUsernameBtn" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-red-600 hover:bg-red-500 text-white pixel-shadow transition whitespace-nowrap">
+                Save Name
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Vote Party Live Counter Card -->
+        <div class="lg:col-span-5 bg-gray-950/85 border border-gray-800 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-xs uppercase font-bold tracking-wider text-amber-400 flex items-center gap-1.5">
+                🎉 Global Server Vote Party
+              </span>
+              <h3 class="text-lg font-extrabold text-white mt-0.5">Tomato Mythic Drop</h3>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-black font-mono text-emerald-400" id="votePartyCurrent">44</span>
+              <span class="text-sm font-mono text-gray-400">/ <span id="votePartyTarget">50</span> Votes</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full h-4 bg-gray-800 rounded-full overflow-hidden p-0.5 border border-gray-700">
+            <div id="votePartyBar" class="h-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-400 transition-all duration-500" style="width: 88%"></div>
+          </div>
+
+          <p class="text-xs text-gray-300 leading-relaxed" id="votePartyStatusText">
+            Only <strong class="text-amber-300">6 more votes</strong> needed! When we hit 50 votes, every online player receives <strong>1x Mythic Tomato Crate</strong> and a <strong>2x XP Boost</strong>.
+          </p>
+
+          <div class="pt-1 flex flex-wrap items-center justify-between gap-2 border-t border-gray-800/80 text-xs">
+            <span class="text-gray-400">Your Votes Today: <strong class="text-white" id="todayVotesCount">0/6</strong></span>
+            <button type="button" id="claimStreakBonusBtn" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition">
+              🎁 Daily Streak Bonus (3+ Votes)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 1: VOTE SITES & LIVE VOTIFIER ==================== -->
+    <section id="tab-vote" class="tab-panel space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+            <span>🗳️</span>
+            <span>Official Voting Sites</span>
+          </h3>
+          <p class="text-xs sm:text-sm text-gray-400">You can vote on each link once every 24 hours. Voting on all 6 sites unlocks a <strong>Bonus Mythic Key</strong>!</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="voteAllSimulateBtn" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white pixel-shadow-green transition">
+            ⚡ Quick Test: Vote Next Site
+          </button>
+          <button type="button" id="resetVotesBtn" class="px-3 py-2 rounded-xl text-xs font-semibold bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition">
+            🔄 Reset Cooldowns
+          </button>
+        </div>
+      </div>
+
+      <!-- 6 Vote Cards Grid -->
+      <div id="voteSitesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+      <!-- Quick Essential Voting Commands Strip + Live Votifier Broadcast Console -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+        <!-- Quick Commands Reference on Vote Page -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-base font-bold text-white flex items-center gap-2">
+                <span>⚡</span>
+                <span>Quick Vote Commands</span>
+              </h4>
+              <p class="text-xs text-gray-400">Use these essential commands in-game after voting:</p>
+            </div>
+            <button type="button" id="goToAllCommandsBtn" class="text-xs font-bold text-red-400 hover:text-red-300 underline">
+              View All Commands →
+            </button>
+          </div>
+
+          <div id="quickVoteCommandsList" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Live Server Votifier Broadcast Terminal -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <h4 class="text-base font-bold text-white">Live Server Vote & Command Console</h4>
+            </div>
+            <span class="text-[11px] font-mono text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">NuVotifier v2.7.2</span>
+          </div>
+
+          <div id="liveConsoleFeed" class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 font-mono text-xs h-52 overflow-y-auto space-y-2"></div>
+
+          <!-- Test Command Input inside Console -->
+          <form id="consoleCommandForm" class="flex items-center gap-2">
+            <input
+              id="consoleCommandInput"
+              type="text"
+              placeholder="Test a command: e.g. /vote, /voterewards, /rtp, /spawn"
+              class="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-red-500"
+            />
+            <button type="submit" class="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition">
+              Run Command
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: SERVER COMMANDS DIRECTORY & BUILDER ==================== -->
+    <section id="tab-commands" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span>⌨️</span>
+              <span>TomatoSMP Server Commands Guide</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-400 mt-0.5">
+              Complete command reference for Voting, Survival, Teleportation, Land Claim, and Economy. Copy any command or add custom ones!
+            </p>
+          </div>
+          <button type="button" id="toggleAddCommandModalBtn" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-bold pixel-shadow transition self-start md:self-auto">
+            ➕ Add Custom Command
+          </button>
+        </div>
+
+        <!-- Search & Category Filter Bar -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+          <!-- Category Filter Pills -->
+          <div id="commandCategoryPills" class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <button type="button" data-cat="all" class="cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white">All Commands</button>
+            <button type="button" data-cat="voting" class="cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 text-gray-300 hover:text-white border border-gray-800">🗳️ Voting</button>
+            <button type="button" data-cat="teleport" class="cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 text-gray-300 hover:text-white border border-gray-800">🧭 Teleport & Homes</button>
+            <button type="button" data-cat="claim" class="cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 text-gray-300 hover:text-white border border-gray-800">🛡️ Land Claim & Clans</button>
+            <button type="button" data-cat="economy" class="cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 text-gray-300 hover:text-white border border-gray-800">💰 Economy & Shop</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative w-full sm:w-64">
+            <input
+              id="commandSearchInput"
+              type="text"
+              placeholder="Search commands (e.g. /vote, /rtp)..."
+              class="w-full bg-gray-950 border border-gray-800 rounded-xl pl-3.5 pr-8 py-2 text-xs text-white focus:outline-none focus:border-red-500"
+            />
+          </div>
+        </div>
+
+        <!-- Commands List Grid -->
+        <div id="commandsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: VOTE SHOP & CRATE PREVIEW ==================== -->
+    <section id="tab-shop" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span>🎁</span>
+              <span>TomatoSMP Vote Points Store</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-400">Redeem your earned Vote Points for exclusive crate keys, claim blocks, tags, and ranks (<code class="text-amber-300 font-mono">/voteshop</code>).</p>
+          </div>
+          <div class="bg-gray-950 border border-emerald-500/30 px-4 py-2.5 rounded-xl flex items-center gap-3">
+            <span class="text-xs text-gray-300">Available Balance:</span>
+            <span class="text-lg font-black font-mono text-emerald-400" id="shopPointsBalance">120 PTS</span>
+          </div>
+        </div>
+
+        <div id="voteShopGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: TOP VOTERS LEADERBOARD ==================== -->
+    <section id="tab-leaderboard" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+              <span>🏆</span>
+              <span>Monthly Top Voters Leaderboard (<code class="text-amber-400 font-mono text-base">/votetop</code>)</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-400">The Top 3 voters every month win the <strong>Tomato King Rank</strong> and up to <strong>5,000 Coins</strong>!</p>
+          </div>
+          <span class="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-lg font-semibold">
+            ⏳ Monthly Reset: 30 Days
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-800 text-[11px] uppercase tracking-wider text-gray-400">
+                <th class="py-3 px-4">Rank</th>
+                <th class="py-3 px-4">Player (IGN)</th>
+                <th class="py-3 px-4">Monthly Votes</th>
+                <th class="py-3 px-4">Vote Streak</th>
+                <th class="py-3 px-4">Monthly Reward</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody" class="divide-y divide-gray-800/70 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Vote Verification / Simulation Modal -->
+  <div id="voteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-red-500/40 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30" id="modalSiteBadge">Voting Portal</span>
+        <button type="button" id="closeVoteModalBtn" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-1">
+        <h3 class="text-xl font-extrabold text-white" id="modalSiteTitle">Vote on MinecraftServers.org</h3>
+        <p class="text-xs text-gray-300">
+          Voting Account: <strong class="text-amber-300 font-mono" id="modalPlayerName">TomatoPlayer</strong>
+        </p>
+      </div>
+      <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-2 text-xs">
+        <div class="text-gray-400 font-semibold">Instant Votifier Reward:</div>
+        <div class="text-emerald-300 font-bold" id="modalRewardText">1x Tomato Vote Key + $500 Coins + 25 Vote Points</div>
+        <div class="text-[11px] text-gray-400 font-mono pt-1 border-t border-gray-800" id="modalCommandPreview">
+          Server Trigger: /crate givekey TomatoPlayer Vote 1
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button type="button" id="cancelVoteModalBtn" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold">
+          Cancel
+        </button>
+        <button type="button" id="confirmVoteModalBtn" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold pixel-shadow-green transition">
+          ✅ Confirm Vote & Claim Reward
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Custom Command Modal -->
+  <div id="addCommandModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-red-500/40 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-white">➕ Add New Command to TomatoSMP</h3>
+        <button type="button" id="closeAddCommandModalBtn" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <form id="addCommandForm" class="space-y-3 text-xs">
+        <div>
+          <label for="newCmdSyntax" class="block text-gray-300 font-semibold mb-1">Command Syntax (e.g. /kit tomato)</label>
+          <input id="newCmdSyntax" type="text" required placeholder="/kit tomato" class="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-red-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="newCmdCategory" class="block text-gray-300 font-semibold mb-1">Category</label>
+            <select id="newCmdCategory" class="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500">
+              <option value="voting">Voting</option>
+              <option value="teleport">Teleport & Homes</option>
+              <option value="claim">Land Claim & Clans</option>
+              <option value="economy">Economy & Shop</option>
+            </select>
+          </div>
+          <div>
+            <label for="newCmdRank" class="block text-gray-300 font-semibold mb-1">Permission / Rank</label>
+            <select id="newCmdRank" class="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500">
+              <option value="Everyone">Everyone</option>
+              <option value="Voter">Voter</option>
+              <option value="TomatoVIP">TomatoVIP</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="newCmdDesc" class="block text-gray-300 font-semibold mb-1">Command Description</label>
+          <input id="newCmdDesc" type="text" required placeholder="Claim your free daily Tomato survival kit" class="w-full bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelAddCommandBtn" class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold">Add Command</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden bg-gray-900/95 border border-emerald-500/50 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Copied to clipboard!</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-800/80 bg-gray-950/80 py-5 px-4 mt-10 text-xs text-gray-400">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-red-500 font-bold">🍅 TomatoSMP Network</span>
+        <span>•</span>
+        <span>Java & Bedrock Crossplay (<code class="text-gray-300 font-mono">TomatoSMP.aternos.me:19132</code>)</span>
+      </div>
+      <div>Not affiliated with Mojang AB. Designed for TomatoSMP Community.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ==================== STATE & INITIAL DATA ====================
+    const state = {
+      playerName: 'TomatoPlayer',
+      edition: 'Java',
+      keys: 2,
+      points: 120,
+      votePartyCurrent: 44,
+      votePartyTarget: 50,
+      streakClaimed: false,
+      activeTab: 'vote',
+      activeCmdCategory: 'all',
+      cmdSearch: '',
+      pendingVoteSiteId: null,
+      voteSites: [
+        {
+          id: 1,
+          name: 'MinecraftServers.org',
+          badge: 'Link #1 • Official',
+          reward: '1x Tomato Vote Key + $500 Coins',
+          pointsReward: 25,
+          keysReward: 1,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/crate givekey {player} TomatoVote 1'
+        },
+        {
+          id: 2,
+          name: 'PlanetMinecraft.com',
+          badge: 'Link #2 • Popular',
+          reward: '1x Tomato Vote Key + 5x Golden Apples',
+          pointsReward: 25,
+          keysReward: 1,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/give {player} golden_apple 5'
+        },
+        {
+          id: 3,
+          name: 'TopG.org Minecraft',
+          badge: 'Link #3 • Fast Verify',
+          reward: '1x Tomato Vote Key + 150 Claim Blocks',
+          pointsReward: 25,
+          keysReward: 1,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/acb {player} 150'
+        },
+        {
+          id: 4,
+          name: 'Minecraft-MP.com',
+          badge: 'Link #4 • Daily Key',
+          reward: '1x Tomato Vote Key + 16x XP Bottles',
+          pointsReward: 25,
+          keysReward: 1,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/give {player} experience_bottle 16'
+        },
+        {
+          id: 5,
+          name: 'TopMinecraftServers',
+          badge: 'Link #5 • Economy Boost',
+          reward: '1x Tomato Vote Key + $750 Coins',
+          pointsReward: 30,
+          keysReward: 1,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/eco give {player} 750'
+        },
+        {
+          id: 6,
+          name: 'MinecraftBuzz.com',
+          badge: 'Link #6 • 2x Bonus Link!',
+          reward: '2x Tomato Vote Keys + $1,000 Coins',
+          pointsReward: 50,
+          keysReward: 2,
+          voted: false,
+          cooldown: 'Ready to Vote',
+          serverCmd: '/crate givekey {player} TomatoVote 2'
+        }
+      ],
+      commands: [
+        {
+          id: 'c1',
+          syntax: '/vote',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Open all 6 official server voting links and check your vote cooldowns in chat.',
+          output: '[TomatoSMP] 🍅 Click any voting link in chat to earn Vote Keys & $500 Coins!'
+        },
+        {
+          id: 'c2',
+          syntax: '/voterewards',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Claim all your pending Vote Crate Keys and queued voting rewards into your inventory.',
+          output: '[TomatoSMP] 🎁 You have claimed all your pending Vote Rewards and Crate Keys!'
+        },
+        {
+          id: 'c3',
+          syntax: '/voteparty',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Check how many votes are needed to trigger the next Server-Wide Vote Party drop.',
+          output: '[VoteParty] 🎉 Only a few votes left until the global Mythic Crate Drop!'
+        },
+        {
+          id: 'c4',
+          syntax: '/voteshop',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Open the Vote Points GUI store to redeem custom items, crate keys, and ranks.',
+          output: '[VoteShop] 🛒 Opening TomatoSMP Vote Point Store GUI...'
+        },
+        {
+          id: 'c5',
+          syntax: '/votetop',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Display the top 10 monthly voters leaderboard directly in game chat.',
+          output: '[VoteTop] 🏆 #1 AryanMC (168) | #2 PriyanshuOP (155) | #3 TomatoKing_YT (142)'
+        },
+        {
+          id: 'c6',
+          syntax: '/warp crates',
+          category: 'voting',
+          rank: 'Everyone',
+          desc: 'Teleport directly to the Vote Crates and Mythic Crates area at Spawn.',
+          output: '[TomatoSMP] ⚡ Teleporting to Tomato Crate Pedestals in 3 seconds...'
+        },
+        {
+          id: 'c7',
+          syntax: '/rtp',
+          category: 'teleport',
+          rank: 'Everyone',
+          desc: 'Randomly teleport to a safe wilderness location in the Survival world.',
+          output: '[RTP] 🌲 Safe location found at X: 1,420, Z: -890 (Plains Biome). Teleporting!'
+        },
+        {
+          id: 'c8',
+          syntax: '/sethome base',
+          category: 'teleport',
+          rank: 'Everyone',
+          desc: 'Save your current base coordinates so you can teleport back anytime with /home base.',
+          output: '[Homes] 🏠 Home "base" has been set at your current coordinates!'
+        },
+        {
+          id: 'c9',
+          syntax: '/tpa <player>',
+          category: 'teleport',
+          rank: 'Everyone',
+          desc: 'Send a teleport request to another online player on the server.',
+          output: '[TPA] 📨 Teleport request sent! They have 60 seconds to type /tpaccept.'
+        },
+        {
+          id: 'c10',
+          syntax: '/spawn',
+          category: 'teleport',
+          rank: 'Everyone',
+          desc: 'Teleport back to the TomatoSMP Main Spawn and Shopping District.',
+          output: '[TomatoSMP] 🍅 Teleported back to TomatoSMP Main Spawn!'
+        },
+        {
+          id: 'c11',
+          syntax: '/claim',
+          category: 'claim',
+          rank: 'Everyone',
+          desc: 'Claim and protect your land and builds from griefing or raiding.',
+          output: '[LandClaim] 🛡️ 10x10 area claimed! Use /trust <player> to add friends.'
+        },
+        {
+          id: 'c12',
+          syntax: '/trust <player>',
+          category: 'claim',
+          rank: 'Everyone',
+          desc: 'Grant a friend permission to build and open containers in your claimed land.',
+          output: '[LandClaim] 🤝 Trusted player in your claimed land!'
+        },
+        {
+          id: 'c13',
+          syntax: '/clan create <name>',
+          category: 'claim',
+          rank: 'Everyone',
+          desc: 'Create your own TomatoSMP Clan and team up with friends for PvP and events.',
+          output: '[Clans] ⚔️ Clan created! Invite members using /clan invite <player>.'
+        },
+        {
+          id: 'c14',
+          syntax: '/bal',
+          category: 'economy',
+          rank: 'Everyone',
+          desc: 'Check your current Tomato Coins ($ balance) in the server economy.',
+          output: '[Economy] 💰 Balance: $4,500 Tomato Coins.'
+        },
+        {
+          id: 'c15',
+          syntax: '/ah',
+          category: 'economy',
+          rank: 'Everyone',
+          desc: 'Open the global Player Auction House to buy and sell items with other players.',
+          output: '[AuctionHouse] 🏷️ Opening Global Player Auction House...'
+        }
+      ],
+      shopItems: [
+        {
+          id: 's1',
+          name: 'Mythic Tomato Crate Key',
+          desc: 'Unlock a chance to win Netherite Gear, a Custom Tomato Sword, or 50,000 Coins!',
+          cost: 50,
+          cmd: '/voteshop buy mythic_key',
+          badge: 'Best Seller'
+        },
+        {
+          id: 's2',
+          name: '2,500 Claim Blocks Pack',
+          desc: 'Instantly add 2,500 bonus Land Claim Blocks to expand and protect your base or farms.',
+          cost: 60,
+          cmd: '/voteshop buy claimblocks_2500',
+          badge: 'Survival'
+        },
+        {
+          id: 's3',
+          name: '[TomatoLegend] Chat Tag',
+          desc: 'Show off a glowing red-and-gold [TomatoLegend] prefix tag in chat and on the tablist.',
+          cost: 90,
+          cmd: '/voteshop buy tag_tomatolegend',
+          badge: 'Cosmetic'
+        },
+        {
+          id: 's4',
+          name: 'Temp Fly Permission (24h)',
+          desc: 'Unlock 24 hours of flight (/fly) inside your claimed survival land.',
+          cost: 100,
+          cmd: '/voteshop buy tempfly_24h',
+          badge: 'Utility'
+        },
+        {
+          id: 's5',
+          name: 'Iron Golem Spawner (1x)',
+          desc: 'Get a placeable Iron Golem Spawner to build high-efficiency iron and coin farms!',
+          cost: 150,
+          cmd: '/voteshop buy spawner_irongolem',
+          badge: 'OP Item'
+        },
+        {
+          id: 's6',
+          name: 'TomatoVIP Rank (7 Days)',
+          desc: 'Unlock 5 Homes, portable /ec (Enderchest), /hat, and full access to the VIP Kit.',
+          cost: 200,
+          cmd: '/voteshop buy rank_vip_7d',
+          badge: 'VIP Rank'
+        }
+      ],
+      leaderboard: [
+        { name: 'AryanMC', votes: 168, streak: '28 Days', reward: '👑 Tomato Emperor + 5,000 Coins' },
+        { name: 'PriyanshuOP', votes: 155, streak: '25 Days', reward: '⚔️ Tomato VIP+ + 2,500 Coins' },
+        { name: 'TomatoKing_YT', votes: 142, streak: '23 Days', reward: '🎁 3x Mythic Keys + 1,000 Coins' },
+        { name: 'RohanBuilds', votes: 129, streak: '19 Days', reward: '🔑 2x Vote Crate Keys' },
+        { name: 'NehaCraft', votes: 118, streak: '16 Days', reward: '🔑 2x Vote Crate Keys' }
+      ],
+      consoleLogs: [
+        { time: '17:32:10', text: '[NuVotifier] Connected to TomatoSMP (TomatoSMP.aternos.me:8192) — Listening for votes.' },
+        { time: '17:33:05', text: '🍅 [Vote] PriyanshuOP voted on PlanetMinecraft and received 1x Tomato Vote Key + $500!' },
+        { time: '17:34:19', text: '🎉 [VoteParty] 44/50 votes reached! Only 6 more votes for a global Mythic Drop.' }
+      ]
+    };
+
+    // ==================== HELPER FUNCTIONS ====================
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toastBanner');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3200);
+    }
+
+    function copyTextToClipboard(text, label) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(label || `Copied: ${text}`);
+        }).catch(() => fallbackCopy(text, label));
+      } else {
+        fallbackCopy(text, label);
+      }
+    }
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(label || `Copied: ${text}`);
+      } catch (e) {
+        showToast(`Copy: ${text}`, '📋');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function addConsoleLog(text) {
+      const now = new Date();
+      const timeStr = now.toTimeString().slice(0, 8);
+      state.consoleLogs.push({ time: timeStr, text });
+      if (state.consoleLogs.length > 30) state.consoleLogs.shift();
+      renderConsoleFeed();
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    function renderHeaderStats() {
+      document.getElementById('headerPlayerName').textContent = state.playerName;
+      document.getElementById('playerAvatarBadge').textContent = (state.playerName.replace('.', '')[0] || 'T').toUpperCase();
+      document.getElementById('headerEditionTag').textContent = state.edition;
+      document.getElementById('userKeysCount').textContent = state.keys;
+      document.getElementById('userPointsCount').textContent = state.points;
+      document.getElementById('shopPointsBalance').textContent = `${state.points} PTS`;
+
+      const votedCount = state.voteSites.filter(s => s.voted).length;
+      document.getElementById('todayVotesCount').textContent = `${votedCount}/${state.voteSites.length}`;
+
+      // Vote Party bar
+      const pct = Math.min(100, Math.round((state.votePartyCurrent / state.votePartyTarget) * 100));
+      document.getElementById('votePartyCurrent').textContent = state.votePartyCurrent;
+      document.getElementById('votePartyTarget').textContent = state.votePartyTarget;
+      document.getElementById('votePartyBar').style.width = `${pct}%`;
+
+      const remaining = Math.max(0, state.votePartyTarget - state.votePartyCurrent);
+      const statusEl = document.getElementById('votePartyStatusText');
+      if (remaining === 0) {
+        statusEl.innerHTML = `<strong class="text-emerald-400">🎉 VOTE PARTY ACTIVATED!</strong> Every online player on the server has received <strong>1x Mythic Tomato Crate</strong>!`;
+      } else {
+        statusEl.innerHTML = `Only <strong class="text-amber-300">${remaining} more votes</strong> needed! When we reach 50 votes, every online player gets <strong>1x Mythic Tomato Crate</strong> and a <strong>2x XP Boost</strong>.`;
+      }
+    }
+
+    function renderVoteSites() {
+      const grid = document.getElementById('voteSitesGrid');
+      grid.innerHTML = state.voteSites.map(site => {
+        const btnClass = site.voted
+          ? 'bg-gray-800 text-emerald-400 border border-emerald-500/30 cursor-pointer'
+          : 'bg-red-600 hover:bg-red-500 text-white pixel-shadow';
+        const btnLabel = site.voted ? '✅ Voted (23h 59m)' : '🗳️ Vote Now';
+
+        return `
+          <div class="glass-card glass-card-hover rounded-2xl p-5 flex flex-col justify-between gap-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${site.id === 6 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-red-500/15 text-red-300 border border-red-500/25'}">
+                  ${site.badge}
+                </span>
+                <span class="text-xs font-mono font-bold text-emerald-400">+${site.pointsReward} PTS</span>
+              </div>
+              <h4 class="text-lg font-extrabold text-white">${site.name}</h4>
+              <div class="bg-gray-950/80 border border-gray-800/90 rounded-xl p-3 text-xs space-y-1">
+                <div class="text-gray-400">Reward on Vote:</div>
+                <div class="text-amber-300 font-bold">${site.reward}</div>
+              </div>
+            </div>
+            <button type="button" data-vote-id="${site.id}" class="vote-site-btn w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition ${btnClass}">
+              ${btnLabel}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.vote-site-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const siteId = Number(btn.getAttribute('data-vote-id'));
+          openVoteModal(siteId);
+        });
+      });
+    }
+
+    function renderQuickVoteCommands() {
+      const container = document.getElementById('quickVoteCommandsList');
+      const votingCmds = state.commands.filter(c => c.category === 'voting').slice(0, 5);
+      container.innerHTML = votingCmds.map(cmd => `
+        <div class="bg-gray-950/85 border border-gray-800 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <code class="text-amber-300 font-mono font-bold text-xs sm:text-sm">${cmd.syntax}</code>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-gray-800 text-gray-300">${cmd.rank}</span>
+            </div>
+            <p class="text-xs text-gray-400 truncate mt-0.5">${cmd.desc}</p>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" data-copy-cmd="${cmd.syntax}" class="quick-copy-btn px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 transition">
+              📋 Copy
+            </button>
+            <button type="button" data-run-cmd="${cmd.syntax}" class="quick-run-btn px-2.5 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/35 text-red-300 border border-red-500/30 text-xs font-semibold transition">
+              ▶ Test
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.quick-copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const syntax = btn.getAttribute('data-copy-cmd');
+          copyTextToClipboard(syntax, `Command copied: ${syntax}`);
+        });
+      });
+
+      container.querySelectorAll('.quick-run-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const syntax = btn.getAttribute('data-run-cmd');
+          executeSimulatedCommand(syntax);
+        });
+      });
+    }
+
+    function renderConsoleFeed() {
+      const feed = document.getElementById('liveConsoleFeed');
+      feed.innerHTML = state.consoleLogs.map(item => `
+        <div class="leading-relaxed">
+          <span class="text-gray-500">[${item.time}]</span>
+          <span class="text-gray-200 ml-1">${item.text}</span>
+        </div>
+      `).join('');
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function renderCommandsDirectory() {
+      const grid = document.getElementById('commandsGrid');
+      const query = state.cmdSearch.trim().toLowerCase();
+      const filtered = state.commands.filter(c => {
+        const matchesCat = state.activeCmdCategory === 'all' || c.category === state.activeCmdCategory;
+        const matchesSearch = !query || c.syntax.toLowerCase().includes(query) || c.desc.toLowerCase().includes(query);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-gray-950/70 border border-gray-800 rounded-xl p-8 text-center text-gray-400 text-sm">
+            No matching commands found. Click "➕ Add Custom Command" above to add a new command!
+          </div>
+        `;
+        return;
+      }
+
+      const catLabels = {
+        voting: '🗳️ Voting',
+        teleport: '🧭 Teleport',
+        claim: '🛡️ Claim & Clan',
+        economy: '💰 Economy'
+      };
+
+      grid.innerHTML = filtered.map(cmd => `
+        <div class="bg-gray-950/85 border border-gray-800 hover:border-red-500/40 rounded-xl p-4 flex flex-col justify-between gap-3 transition">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <code class="text-sm sm:text-base font-mono font-bold text-amber-300 bg-gray-900 px-2.5 py-1 rounded-lg border border-gray-800">${cmd.syntax}</code>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-gray-800 text-gray-300">${catLabels[cmd.category] || cmd.category}</span>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">${cmd.rank}</span>
+              </div>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${cmd.desc}</p>
+          </div>
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-800/70">
+            <button type="button" data-copy-cmd="${cmd.syntax}" class="dir-copy-btn px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-white transition">
+              📋 Copy Command
+            </button>
+            <button type="button" data-run-cmd="${cmd.syntax}" class="dir-run-btn px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/35 text-red-300 border border-red-500/30 text-xs font-semibold transition">
+              ▶ Test in Console
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      grid.querySelectorAll('.dir-copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const syntax = btn.getAttribute('data-copy-cmd');
+          copyTextToClipboard(syntax, `Command copied: ${syntax}`);
+        });
+      });
+
+      grid.querySelectorAll('.dir-run-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const syntax = btn.getAttribute('data-run-cmd');
+          executeSimulatedCommand(syntax);
+          showToast(`Simulated in Console: ${syntax}`, '⌨️');
+        });
+      });
+    }
+
+    function renderVoteShop() {
+      const grid = document.getElementById('voteShopGrid');
+      grid.innerHTML = state.shopItems.map(item => {
+        const canAfford = state.points >= item.cost;
+        return `
+          <div class="bg-gray-950/85 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between gap-4">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-red-500/15 text-red-300 border border-red-500/30">${item.badge}</span>
+                <span class="text-sm font-mono font-extrabold text-emerald-400">${item.cost} PTS</span>
+              </div>
+              <h4 class="text-base font-extrabold text-white">${item.name}</h4>
+              <p class="text-xs text-gray-400 leading-relaxed">${item.desc}</p>
+              <div class="text-[11px] font-mono text-gray-400 bg-gray-900 px-2.5 py-1 rounded border border-gray-800">
+                Cmd: <span class="text-amber-300">${item.cmd}</span>
+              </div>
+            </div>
+            <button type="button" data-shop-id="${item.id}" class="shop-redeem-btn w-full py-2.5 px-4 rounded-xl text-xs font-bold transition ${canAfford ? 'bg-emerald-600 hover:bg-emerald-500 text-white pixel-shadow-green' : 'bg-gray-800 text-gray-400 border border-gray-700'}">
+              ${canAfford ? '🛒 Redeem with Vote Points' : `🔒 Need ${item.cost - state.points} more PTS`}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.shop-redeem-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const itemId = btn.getAttribute('data-shop-id');
+          const item = state.shopItems.find(i => i.id === itemId);
+          if (!item) return;
+          if (state.points < item.cost) {
+            showToast(`Not enough Vote Points! Vote on more links (${item.cost} PTS required).`, '⚠️');
+            return;
+          }
+          state.points -= item.cost;
+          addConsoleLog(`🛒 [VoteShop] ${state.playerName} redeemed "${item.name}" via ${item.cmd}!`);
+          renderAll();
+          showToast(`🎉 Redeemed "${item.name}"! Claim it in-game with /voterewards.`);
+        });
+      });
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardTableBody');
+      const userVotedCount = state.voteSites.filter(s => s.voted).length;
+      const combined = [
+        ...state.leaderboard,
+        {
+          name: `${state.playerName} (You)`,
+          votes: 112 + userVotedCount,
+          streak: `${14 + (userVotedCount > 0 ? 1 : 0)} Days`,
+          reward: '🔑 2x Vote Crate Keys',
+          isCurrentUser: true
+        }
+      ].sort((a, b) => b.votes - a.votes);
+
+      tbody.innerHTML = combined.map((row, idx) => {
+        const rankBadge = idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`;
+        return `
+          <tr class="${row.isCurrentUser ? 'bg-red-500/10 border-l-2 border-red-500' : 'hover:bg-gray-900/50'}">
+            <td class="py-3.5 px-4 font-mono font-bold text-white">${rankBadge}</td>
+            <td class="py-3.5 px-4 font-bold ${row.isCurrentUser ? 'text-amber-300' : 'text-white'}">${row.name}</td>
+            <td class="py-3.5 px-4 font-mono text-emerald-400 font-bold">${row.votes} Votes</td>
+            <td class="py-3.5 px-4 text-gray-300">${row.streak}</td>
+            <td class="py-3.5 px-4 text-xs text-amber-300 font-semibold">${row.reward}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAll() {
+      renderHeaderStats();
+      renderVoteSites();
+      renderQuickVoteCommands();
+      renderConsoleFeed();
+      renderCommandsDirectory();
+      renderVoteShop();
+      renderLeaderboard();
+    }
+
+    // ==================== INTERACTIVE ACTIONS ====================
+    function openVoteModal(siteId) {
+      const site = state.voteSites.find(s => s.id === siteId);
+      if (!site) return;
+      state.pendingVoteSiteId = siteId;
+      document.getElementById('modalSiteBadge').textContent = site.badge;
+      document.getElementById('modalSiteTitle').textContent = `Vote on ${site.name}`;
+      document.getElementById('modalPlayerName').textContent = state.playerName;
+      document.getElementById('modalRewardText').textContent = `${site.reward} + ${site.pointsReward} Vote Points`;
+      document.getElementById('modalCommandPreview').textContent = `Votifier Dispatch: ${site.serverCmd.replace('{player}', state.playerName)}`;
+
+      const modal = document.getElementById('voteModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeVoteModal() {
+      const modal = document.getElementById('voteModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      state.pendingVoteSiteId = null;
+    }
+
+    function confirmVoteForSite(siteId) {
+      const site = state.voteSites.find(s => s.id === siteId);
+      if (!site) return;
+
+      if (site.voted) {
+        showToast(`You have already voted on ${site.name} today!`, 'ℹ️');
+        closeVoteModal();
+        return;
+      }
+
+      site.voted = true;
+      state.keys += site.keysReward;
+      state.points += site.pointsReward;
+      state.votePartyCurrent = Math.min(state.votePartyTarget, state.votePartyCurrent + 1);
+
+      addConsoleLog(`🍅 [Votifier] Vote received from ${state.playerName} on ${site.name}! Dispatched: ${site.serverCmd.replace('{player}', state.playerName)}`);
+
+      if (state.votePartyCurrent >= state.votePartyTarget) {
+        addConsoleLog(`🎉 [VOTE PARTY] 50/50 Votes reached! Executing: /crate giveall TomatoMythic 1`);
+      }
+
+      closeVoteModal();
+      renderAll();
+      showToast(`🎉 Vote verified! Earned +${site.keysReward} Vote Key & +${site.pointsReward} PTS!`);
+    }
+
+    function executeSimulatedCommand(rawCmd) {
+      const clean = rawCmd.trim();
+      if (!clean) return;
+      const matched = state.commands.find(c => c.syntax.toLowerCase().split(' ')[0] === clean.toLowerCase().split(' ')[0]);
+      addConsoleLog(`${state.playerName} issued server command: ${clean}`);
+      if (matched && matched.output) {
+        addConsoleLog(matched.output);
+      } else {
+        addConsoleLog(`[TomatoSMP] Executed "${clean}" for player ${state.playerName}.`);
+      }
+    }
+
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== `tab-${tabName}`);
+      });
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        const isCurrent = btn.getAttribute('data-tab') === tabName;
+        btn.className = isCurrent
+          ? 'nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-red-600 text-white shadow'
+          : 'nav-tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-gray-300 hover:text-white hover:bg-gray-800/70';
+      });
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+
+      // Copy Server IP button
+      document.getElementById('copyTopIpBtn').addEventListener('click', () => {
+        copyTextToClipboard('TomatoSMP.aternos.me', 'Server IP copied: TomatoSMP.aternos.me');
+      });
+
+      // Navigation Tabs
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      // Go to all commands link
+      document.getElementById('goToAllCommandsBtn').addEventListener('click', () => {
+        switchTab('commands');
+      });
+
+      // Edition Switcher & Username Save
+      const mcInput = document.getElementById('mcUsernameInput');
+      const javaBtn = document.getElementById('editionJavaBtn');
+      const bedrockBtn = document.getElementById('editionBedrockBtn');
+
+      javaBtn.addEventListener('click', () => {
+        state.edition = 'Java';
+        if (mcInput.value.startsWith('.')) {
+          mcInput.value = mcInput.value.slice(1);
+        }
+        state.playerName = mcInput.value.trim() || 'TomatoPlayer';
+        javaBtn.className = 'px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white border border-emerald-400/40 transition';
+        bedrockBtn.className = 'px-3 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition';
+        renderAll();
+      });
+
+      bedrockBtn.addEventListener('click', () => {
+        state.edition = 'Bedrock';
+        if (!mcInput.value.startsWith('.')) {
+          mcInput.value = '.' + (mcInput.value.trim() || 'TomatoPlayer');
+        }
+        state.playerName = mcInput.value.trim();
+        bedrockBtn.className = 'px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white border border-emerald-400/40 transition';
+        javaBtn.className = 'px-3 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:text-white border border-gray-700 transition';
+        renderAll();
+      });
+
+      document.getElementById('saveUsernameBtn').addEventListener('click', () => {
+        const val = mcInput.value.trim() || 'TomatoPlayer';
+        state.playerName = val;
+        addConsoleLog(`👤 Active voter profile set to: ${state.playerName} (${state.edition} Edition)`);
+        renderAll();
+        showToast(`Username saved: ${state.playerName}`);
+      });
+
+      // Quick Test Vote Next Site
+      document.getElementById('voteAllSimulateBtn').addEventListener('click', () => {
+        const nextSite = state.voteSites.find(s => !s.voted);
+        if (!nextSite) {
+          showToast('All 6 voting links are already completed! Click Reset Cooldowns to test again.', '🎉');
+          return;
+        }
+        confirmVoteForSite(nextSite.id);
+      });
+
+      // Reset Cooldowns
+      document.getElementById('resetVotesBtn').addEventListener('click', () => {
+        state.voteSites.forEach(s => { s.voted = false; });
+        state.streakClaimed = false;
+        state.votePartyCurrent = 44;
+        addConsoleLog('🔄 [System] Daily vote cooldowns have been reset for testing.');
+        renderAll();
+        showToast('All voting link cooldowns have been reset!');
+      });
+
+      // Claim Daily Streak Bonus
+      document.getElementById('claimStreakBonusBtn').addEventListener('click', () => {
+        const votedCount = state.voteSites.filter(s => s.voted).length;
+        if (state.streakClaimed) {
+          showToast('Today\'s Daily Streak Bonus has already been claimed!', 'ℹ️');
+          return;
+        }
+        if (votedCount < 3) {
+          showToast(`Vote on at least 3 links to claim the Streak Bonus (Current: ${votedCount}/3)`, '⚠️');
+          return;
+        }
+        state.streakClaimed = true;
+        state.keys += 2;
+        state.points += 75;
+        addConsoleLog(`🔥 [StreakBonus] ${state.playerName} completed 3+ daily votes and received +2 Bonus Crate Keys & +75 PTS!`);
+        renderAll();
+        showToast('🎁 Daily Streak Bonus Claimed: +2 Keys & +75 Points!');
+      });
+
+      // Vote Modal Controls
+      document.getElementById('closeVoteModalBtn').addEventListener('click', closeVoteModal);
+      document.getElementById('cancelVoteModalBtn').addEventListener('click', closeVoteModal);
+      document.getElementById('confirmVoteModalBtn').addEventListener('click', () => {
+        if (state.pendingVoteSiteId) {
+          confirmVoteForSite(state.pendingVoteSiteId);
+        }
+      });
+
+      // Console Command Form
+      document.getElementById('consoleCommandForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('consoleCommandInput');
+        if (!input.value.trim()) return;
+        executeSimulatedCommand(input.value);
+        input.value = '';
+      });
+
+      // Command Category Filter Pills
+      document.querySelectorAll('.cmd-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeCmdCategory = btn.getAttribute('data-cat');
+          document.querySelectorAll('.cmd-cat-btn').forEach(b => {
+            const active = b.getAttribute('data-cat') === state.activeCmdCategory;
+            b.className = active
+              ? 'cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white'
+              : 'cmd-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 text-gray-300 hover:text-white border border-gray-800';
+          });
+          renderCommandsDirectory();
+        });
+      });
+
+      // Command Search Input
+      document.getElementById('commandSearchInput').addEventListener('input', e => {
+        state.cmdSearch = e.target.value;
+        renderCommandsDirectory();
+      });
+
+      // Add Custom Command Modal
+      const addCmdModal = document.getElementById('addCommandModal');
+      const openAddCmd = () => {
+        addCmdModal.classList.remove('hidden');
+        addCmdModal.classList.add('flex');
+      };
+      const closeAddCmd = () => {
+        addCmdModal.classList.add('hidden');
+        addCmdModal.classList.remove('flex');
+      };
+
+      document.getElementById('toggleAddCommandModalBtn').addEventListener('click', openAddCmd);
+      document.getElementById('closeAddCommandModalBtn').addEventListener('click', closeAddCmd);
+      document.getElementById('cancelAddCommandBtn').addEventListener('click', closeAddCmd);
+
+      document.getElementById('addCommandForm').addEventListener('submit', e => {
+        e.preventDefault();
+        let syntax = document.getElementById('newCmdSyntax').value.trim();
+        if (!syntax.startsWith('/')) syntax = '/' + syntax;
+        const category = document.getElementById('newCmdCategory').value;
+        const rank = document.getElementById('newCmdRank').value;
+        const desc = document.getElementById('newCmdDesc').value.trim();
+
+        state.commands.unshift({
+          id: 'custom_' + Date.now(),
+          syntax,
+          category,
+          rank,
+          desc,
+          output: `[TomatoSMP] Custom command ${syntax} executed for ${state.playerName}!`
+        });
+
+        document.getElementById('newCmdSyntax').value = '';
+        document.getElementById('newCmdDesc').value = '';
+        closeAddCmd();
+        renderAll();
+        showToast(`Added new command: ${syntax}`);
+      });
+    });
+  </script>
+</body>
+</html>
